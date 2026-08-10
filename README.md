@@ -1,5 +1,7 @@
 # HK Split
 
+[![Deploy HK Split to GitHub Pages](https://github.com/DulanMahamithawa/HK-Split/actions/workflows/pages.yml/badge.svg)](https://github.com/DulanMahamithawa/HK-Split/actions/workflows/pages.yml)
+
 A small shared expense-settlement app for trips and hangouts. HK Split supports:
 
 - Bhagya, Buddhi, Dulan, Kasuni, Shirantha, Udula, and Umali
