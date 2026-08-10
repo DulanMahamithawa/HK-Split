@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#16382d">
+  <meta name="description" content="HK Split — simple shared trip and hangout settlements.">
+  <title>HK Split</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="HK Split home">
+      <span class="brand-mark">HK</span>
+      <span>HK Split</span>
+    </a>
+    <div id="syncStatus" class="sync-status" aria-live="polite">
+      <span class="sync-dot"></span><span>Connecting…</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Less maths. More memories.</p>
+        <h1>Settle up,<br><em>stay friends.</em></h1>
+        <p class="hero-copy">Track what everyone covered, split each expense fairly, and finish every trip with a clean slate.</p>
+      </div>
+      <button class="button button-primary hero-action" type="button" data-action="open-case-modal">
+        <span class="button-icon">＋</span> New case
+      </button>
+    </section>
+
+    <nav class="tabs" aria-label="Main sections">
+      <button class="tab is-active" type="button" data-tab="active">Active cases <span id="activeCount" class="count">0</span></button>
+      <button class="tab" type="button" data-tab="closed">Closed cases <span id="closedCount" class="count">0</span></button>
+      <button class="tab" type="button" data-tab="bank">Bank details</button>
+    </nav>
+
+    <section id="activePanel" class="panel" data-panel="active">
+      <div id="activeCases" class="case-grid"></div>
+    </section>
+
+    <section id="closedPanel" class="panel" data-panel="closed" hidden>
+      <div id="closedCases" class="case-grid"></div>
+    </section>
+
+    <section id="bankPanel" class="panel" data-panel="bank" hidden>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Shared directory</p>
+          <h2>Bank details</h2>
+        </div>
+        <p>Anyone with this app can view and update these details.</p>
+      </div>
+      <div id="bankCards" class="bank-grid"></div>
+    </section>
+  </main>
+
+  <dialog id="caseModal" class="modal">
+    <form id="caseForm" method="dialog" novalidate>
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">A fresh split</p>
+          <h2>New case</h2>
+        </div>
+        <button class="icon-button" type="button" data-action="close-case-modal" aria-label="Close">×</button>
+      </div>
+
+      <div class="form-row two-columns">
+        <label>Case name
+          <input id="caseTitle" name="title" type="text" maxlength="80" placeholder="Ella weekend" required>
+        </label>
+        <label>Date
+          <input id="caseDate" name="date" type="date" required>
+        </label>
+      </div>
+
+      <fieldset>
+        <legend>Who was involved?</legend>
+        <div id="participantPicker" class="person-picker"></div>
+      </fieldset>
+
+      <div class="expense-header">
+        <div>
+          <h3>Contributions</h3>
+          <p>Add as many records as needed. Exclusions apply only to that record.</p>
+        </div>
+        <button class="button button-secondary button-small" type="button" data-action="add-expense">＋ Add record</button>
+      </div>
+      <div id="expenseRows" class="expense-list"></div>
+      <p id="caseError" class="form-error" role="alert"></p>
+
+      <div class="modal-actions">
+        <button class="button button-ghost" type="button" data-action="close-case-modal">Cancel</button>
+        <button class="button button-primary" type="submit">Calculate & save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirmModal" class="modal modal-small">
+    <div class="modal-header">
+      <div>
+        <p class="eyebrow">Just checking</p>
+        <h2 id="confirmTitle">Are you sure?</h2>
+      </div>
+      <button class="icon-button" type="button" data-action="cancel-confirm" aria-label="Close">×</button>
+    </div>
+    <p id="confirmMessage" class="confirm-message"></p>
+    <div class="modal-actions">
+      <button class="button button-ghost" type="button" data-action="cancel-confirm">Cancel</button>
+      <button id="confirmButton" class="button button-danger" type="button">Confirm</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <template id="expenseTemplate">
+    <article class="expense-row">
+      <div class="expense-row-top">
+        <span class="record-number"></span>
+        <button class="text-button danger-text" type="button" data-action="remove-expense">Remove</button>
+      </div>
+      <div class="form-row expense-fields">
+        <label>Paid by
+          <select class="expense-payer" required></select>
+        </label>
+        <label>Amount (LKR)
+          <input class="expense-amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="4,000" required>
+        </label>
+        <label class="note-field">What was it for?
+          <input class="expense-note" type="text" maxlength="100" placeholder="Drinks, pizza, fuel…" required>
+        </label>
+      </div>
+      <div class="exclusions-wrap">
+        <span class="input-label">Exclude from this record</span>
+        <div class="expense-exclusions person-picker compact"></div>
+        <small>Only the remaining case participants will share this cost.</small>
+      </div>
+    </article>
+  </template>
+
+  <script src="settlement.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
