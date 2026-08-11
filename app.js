@@ -89,16 +89,25 @@ async function api(path, options = {}) {
     },
   });
 
+  // Supabase returns an empty body for successful writes when
+  // `Prefer: return=minimal` is used. Only parse JSON when a body exists.
+  const rawBody = await response.text();
+  let body = null;
+  if (rawBody) {
+    try {
+      body = JSON.parse(rawBody);
+    } catch (_) {
+      body = rawBody;
+    }
+  }
+
   if (!response.ok) {
     let detail = `${response.status} ${response.statusText}`;
-    try {
-      const body = await response.json();
-      detail = body.message || body.hint || detail;
-    } catch (_) { /* response was not JSON */ }
+    if (typeof body === "string") detail = body;
+    else if (body) detail = body.message || body.hint || detail;
     throw new Error(detail);
   }
-  if (response.status === 204) return null;
-  return response.json();
+  return body;
 }
 
 async function loadData({ quiet = false } = {}) {
